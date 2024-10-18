@@ -13,6 +13,7 @@ if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
   use_frameworks! :linkage => linkage.to_sym
 end
+pod 'react-native-webrtc', :path => '../node_modules/@videosdk.live/react-native-webrtc'
 
 target 'videoAppDemo' do
   config = use_native_modules!
