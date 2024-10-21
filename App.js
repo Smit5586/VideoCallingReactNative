@@ -16,6 +16,12 @@ import notifee, { EventType } from '@notifee/react-native';
 
 const App = () => {
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
+  const [meetingId, setMeetingId] = useState(null);
+  const [participants, setParticipants] = useState([]);
+
+  const [isHost, setIsHost] = useState(false);
+  const [name, setName] = useState("");
+
   useEffect(() => {
     const initializeNotifications = async () => {
       const permissionGranted = await NotificationService.initialize();
@@ -39,6 +45,7 @@ const App = () => {
         const receivedMeetingId = remoteMessage?.data?.meetingId;
         if (receivedMeetingId) {
           setMeetingId(receivedMeetingId);
+          setIsHost(false)
         }
       });
 
@@ -46,6 +53,7 @@ const App = () => {
         const { meetingId } = initialMessage?.data || {};
         if (meetingId) {
           setMeetingId(meetingId);
+          setIsHost(false)
           // Alert.alert("Notification", `App opened from notification. Meeting ID: ${meetingId}`);
         }
       });
@@ -67,6 +75,7 @@ const App = () => {
         const receivedMeetingId = notification?.data?.meetingId;
         if (receivedMeetingId) {
           setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
+          setIsHost(false);
         }
         await notifee.cancelNotification(notification.id);
       } else if (type === EventType.DISMISSED) {
@@ -88,11 +97,6 @@ const App = () => {
       Alert.alert('Notification permission was denied.');
     }
   };
-  const [meetingId, setMeetingId] = useState(null);
-  const [participants, setParticipants] = useState([]);
-
-  const [isHost, setIsHost] = useState(false);
-  const [name, setName] = useState("");
 
   const getMeetingId = async (id) => {
     const meetingId = id == null ? await createMeeting({ token }) : id;
