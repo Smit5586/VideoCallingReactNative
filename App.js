@@ -6,13 +6,36 @@ import {
   RTCView,
   MediaStream,
 } from "@videosdk.live/react-native-sdk";
-import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Button, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import MeetingView from "./src/component/MeetingView";
 import { createMeeting, token } from "./api";
 import JoinScreen from "./src/component/JoinScreen";
-
+import { FirebaseService, NotifeeService, NotificationService } from "./src/notifications";
+import messaging from '@react-native-firebase/messaging';
 
 const App = () => {
+  const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      const permissionGranted = await NotificationService.initialize();
+      setIsNotificationEnabled(permissionGranted);
+
+      // Create Notifee notification channel
+      await NotifeeService.createChannel();
+    };
+
+    initializeNotifications();
+    FirebaseService.getToken()
+  }, []);
+
+  const handleEnableNotifications = async () => {
+    const permissionGranted = await NotificationService.initialize();
+    setIsNotificationEnabled(permissionGranted);
+
+    if (!permissionGranted) {
+      Alert.alert('Notification permission was denied.');
+    }
+  };
   const [meetingId, setMeetingId] = useState(null);
   const [participants, setParticipants] = useState([]);
 
@@ -26,6 +49,12 @@ const App = () => {
 
   return meetingId ? (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6FF" }}>
+      {isNotificationEnabled === false && (
+        <View style={{ marginBottom: 20 }}>
+          <Text>Notifications are currently disabled.</Text>
+          <Button title="Enable Notifications" onPress={handleEnableNotifications} />
+        </View>
+      )}
       <Text
         style={{
           alignSelf: "center",

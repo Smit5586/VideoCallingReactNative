@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "682836351256",
+    "project_id": "videosdkdemo-b56da",
+    "storage_bucket": "videosdkdemo-b56da.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682836351256:android:96a2d8bf74492db0c5e66d",
+        "android_client_info": {
+          "package_name": "com.videoappdemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOULQ57n_ZLdn-tLd2QQ_wSgGz5uMgsaM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
