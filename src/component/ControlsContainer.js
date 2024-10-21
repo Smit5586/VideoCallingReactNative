@@ -21,10 +21,12 @@ const Button = ({ onPress, buttonText, backgroundColor }) => {
 
 const ControlsContainer = ({
     isJoined,
+    isHostTwo,
     localMicOn,
     localWebcamOn,
     join,
     leaveOrEnd,
+    leaveForHolst,
     toggleWebcam,
     toggleMic,
     isHost,
@@ -119,9 +121,18 @@ const ControlsContainer = ({
 
                 </>
             )}
+            {(isHostTwo && isJoined) &&
+                <Button
+                    onPress={leaveForHolst}
+                    // buttonText={isJoined ? "Leave" : "End"}
+                    buttonText={"Leave"}
+                    backgroundColor={"#FF0000"}
+                />
+            }
             <Button
                 onPress={leaveOrEnd}
-                buttonText={isJoined ? "Leave" : "End"}
+                // buttonText={isJoined ? "Leave" : "End"}
+                buttonText={!isHostTwo ? "Leave" : "End"}
                 backgroundColor={"#FF0000"}
             />
         </View>

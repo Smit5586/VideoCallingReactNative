@@ -1,11 +1,11 @@
 import { useMeeting } from "@videosdk.live/react-native-sdk";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import ParticipantList from "./ParticipantList";
 import ControlsContainer from "./ControlsContainer";
 
 let isUsingFrontCamera = true;
-const MeetingView = ({ setMeetingId }) => {
+const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
     const { join, leave, toggleMic,
         participants, end,
         localMicOn, localWebcamOn,
@@ -20,7 +20,10 @@ const MeetingView = ({ setMeetingId }) => {
         enableScreenShare,
         disableScreenShare,
 
-    } = useMeeting({});
+    } = useMeeting({
+        onMeetingLeft,
+        onParticipantLeft
+    });
     const participantsArrId = [...participants.keys()];
     const [isJoined, setIsJoined] = useState(false);
     const isHost = localParticipant?.metaData?.role === 'host';
@@ -30,9 +33,31 @@ const MeetingView = ({ setMeetingId }) => {
         setIsJoined(true);
     };
 
+    useEffect(() => {
+        setParticipants([...participants.keys()])
+    }, [participants])
+
+    //Event to determine if the meeting has been left
+    function onMeetingLeft() {
+        console.log("onMeetingLeft");
+        setMeetingId(null);
+    }
+
+    //Event to determine if some other participant has left
+    function onParticipantLeft(participant) {
+        console.log(" onParticipantLeft", participant);
+    }
+
     const handleLeaveOrEnd = () => {
-        if (isJoined && isHost) {
-            leave();
+        console.log("isHostTwo", isHostTwo);
+        console.log("isJoined", isJoined);
+
+        // if (isJoined && isHost) {
+        if (isJoined && isHostTwo) {
+            // leave();
+            // setIsJoined(false);
+            end();
+            setMeetingId(null);
             setIsJoined(false);
         } else if (isJoined) {
             leave();
@@ -44,6 +69,12 @@ const MeetingView = ({ setMeetingId }) => {
             setIsJoined(false);
         }
     };
+
+    const handleLeaveForHost = () => {
+        leave();
+        setIsJoined(false);
+        setMeetingId(null);
+    }
 
     const handleVideoOnOff = () => {
         if (localWebcamOn) {
@@ -102,13 +133,15 @@ const MeetingView = ({ setMeetingId }) => {
 
     return (
         <View style={{ flex: 1 }}>
-            <ParticipantList participants={participantsArrId} />
+            <ParticipantList participants={participantsArrId} localMicOn={localMicOn} name={name} />
             <ControlsContainer
                 isJoined={isJoined}
+                isHostTwo={isHostTwo}
                 localMicOn={localMicOn}
                 localWebcamOn={localWebcamOn}
                 join={handleJoin}
                 leaveOrEnd={handleLeaveOrEnd}
+                leaveForHolst={handleLeaveForHost}
                 toggleWebcam={handleVideoOnOff}
                 toggleMic={handleMicOnOff}
                 isHost={isHost}

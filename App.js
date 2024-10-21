@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MeetingProvider,
   useMeeting,
@@ -14,6 +14,10 @@ import JoinScreen from "./src/component/JoinScreen";
 
 const App = () => {
   const [meetingId, setMeetingId] = useState(null);
+  const [participants, setParticipants] = useState([]);
+
+  const [isHost, setIsHost] = useState(false);
+  const [name, setName] = useState("");
 
   const getMeetingId = async (id) => {
     const meetingId = id == null ? await createMeeting({ token }) : id;
@@ -30,7 +34,7 @@ const App = () => {
           fontStyle: "italic",
           color: "grey",
         }}
-      >{meetingId}</Text>
+      >{meetingId} {"Member" + participants.length}</Text>
       <MeetingProvider
         config={{
           meetingId,
@@ -48,11 +52,14 @@ const App = () => {
         <MeetingView
           meetingId={meetingId}
           setMeetingId={setMeetingId}
+          isHostTwo={isHost}
+          name={name}
+          setParticipants={setParticipants}
         />
       </MeetingProvider>
     </SafeAreaView>
   ) : (
-    <JoinScreen getMeetingId={getMeetingId} />
+    <JoinScreen getMeetingId={getMeetingId} setIsHost={setIsHost} setName={setName} />
   );
 };
 export default App;

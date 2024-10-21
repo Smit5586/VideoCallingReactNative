@@ -2,14 +2,19 @@ import { FlatList, Text, View } from "react-native";
 import ParticipantView from "./ParticipantView";
 
 
-const ParticipantList = ({ participants }) => {
+const ParticipantList = ({ participants, localMicOn, name }) => {
     return participants.length > 0 ? (
-        <FlatList
-            data={participants}
-            renderItem={({ item }) => {
-                return <ParticipantView participantId={item} />;
-            }}
-        />
+        <View>
+            <Text>
+                {name}
+            </Text>
+            <FlatList
+                data={participants}
+                renderItem={({ item }) => {
+                    return <ParticipantView participantId={item} />;
+                }}
+            />
+        </View>
     ) : (
         <View
             style={{
