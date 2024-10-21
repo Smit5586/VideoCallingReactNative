@@ -96,6 +96,17 @@ const App = () => {
 
   const getMeetingId = async (id) => {
     const meetingId = id == null ? await createMeeting({ token }) : id;
+
+    //for sending notification start
+    fetch(`http://192.168.1.37:3000/alarm`, {
+      method: 'POST',
+      body: JSON.stringify({
+        token: 'ed7J916-RA-AvCrBgYIJI-:APA91bGAvyf_XROthpiAeTzhtDXVjU3kTF-06nTNQ3ZFd68AnzJVVfG_IgEL6xuiwppvNpTeoZxsYXMNfVaWB-JdopQXA-tN0pSfxrWQObXiQuzG351f2Na5W2KS8bfWfissGMjqNP6I',
+        meetingId: meetingId
+      })
+    });
+    //for sending notification end 
+
     setMeetingId(meetingId);
   };
 
