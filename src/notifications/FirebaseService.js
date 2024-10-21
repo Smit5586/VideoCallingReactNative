@@ -26,6 +26,24 @@ const FirebaseService = {
             console.log('Foreground message:', remoteMessage);
             callback(remoteMessage);
         });
+    },
+
+    onNotificationOpenedApp: (callback) => {
+        messaging().onNotificationOpenedApp(remoteMessage => {
+            if (remoteMessage) {
+                console.log('App opened from notification:', remoteMessage);
+                callback(remoteMessage);
+            }
+        });
+    },
+
+    checkInitialNotification: async () => {
+        const initialMessage = await messaging().getInitialNotification();
+        if (initialMessage) {
+            console.log('App opened from notification:', initialMessage);
+            return initialMessage;
+        }
+        return null;
     }
 };
 

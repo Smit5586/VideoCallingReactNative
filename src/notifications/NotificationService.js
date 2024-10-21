@@ -23,8 +23,10 @@ const NotificationService = {
             console.log("permissionGranted", permissionGranted);
 
             // If permission is granted, listen to background and foreground notifications
-            NotificationService.listenBackgroundMessages();
-            NotificationService.listenForegroundMessages();
+            // NotificationService.listenBackgroundMessages();
+            // NotificationService.listenForegroundMessages();
+            // FirebaseService.onNotificationOpenedApp();
+            // FirebaseService.checkInitialNotification();
 
 
             return true;
@@ -44,8 +46,6 @@ const NotificationService = {
     listenForegroundMessages: () => {
         // Foreground notifications handler
         FirebaseService.onForegroundNotification(remoteMessage => {
-            console.log("remoteMessage", remoteMessage);
-
             NotifeeService.displayNotification(remoteMessage);
         });
     }

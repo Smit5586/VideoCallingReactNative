@@ -9,6 +9,7 @@ const NotifeeService = {
                 channelId: 'default',
                 importance: AndroidImportance.HIGH,
             },
+            data: remoteMessage.data
         });
     },
 

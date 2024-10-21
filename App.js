@@ -12,6 +12,7 @@ import { createMeeting, token } from "./api";
 import JoinScreen from "./src/component/JoinScreen";
 import { FirebaseService, NotifeeService, NotificationService } from "./src/notifications";
 import messaging from '@react-native-firebase/messaging';
+import notifee, { EventType } from '@notifee/react-native';
 
 const App = () => {
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
@@ -24,8 +25,59 @@ const App = () => {
       await NotifeeService.createChannel();
     };
 
+    const handleNotifications = () => {
+      // FirebaseService.onForegroundNotification(remoteMessage => {
+      //   const receivedMeetingId = remoteMessage?.data?.meetingId;
+      //   if (receivedMeetingId) {
+      //     setMeetingId(receivedMeetingId);
+      //   }
+      // });
+
+      NotificationService.listenForegroundMessages()
+      // Handle notification opened while app is in background
+      FirebaseService.onNotificationOpenedApp(remoteMessage => {
+        const receivedMeetingId = remoteMessage?.data?.meetingId;
+        if (receivedMeetingId) {
+          setMeetingId(receivedMeetingId);
+        }
+      });
+
+      FirebaseService.checkInitialNotification().then(initialMessage => {
+        const { meetingId } = initialMessage?.data || {};
+        if (meetingId) {
+          setMeetingId(meetingId);
+          // Alert.alert("Notification", `App opened from notification. Meeting ID: ${meetingId}`);
+        }
+      });
+    };
+
     initializeNotifications();
-    FirebaseService.getToken()
+    FirebaseService.getToken();
+    handleNotifications();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
+      const { notification } = detail;
+
+      if (type === EventType.PRESS) {
+        console.log('Notification pressed:', notification);
+        // Handle notification tap, navigate to a specific screen
+        // You can extract the meetingId from the notification and set it
+        const receivedMeetingId = notification?.data?.meetingId;
+        if (receivedMeetingId) {
+          setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
+        }
+        await notifee.cancelNotification(notification.id);
+      } else if (type === EventType.DISMISSED) {
+        console.log('Notification dismissed:', notification);
+      }
+    });
+
+    return () => {
+      // Unsubscribe from foreground event when component is unmounted
+      unsubscribe();
+    };
   }, []);
 
   const handleEnableNotifications = async () => {
