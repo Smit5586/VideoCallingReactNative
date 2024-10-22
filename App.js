@@ -6,13 +6,17 @@ import {
   RTCView,
   MediaStream,
 } from "@videosdk.live/react-native-sdk";
-import { Alert, Button, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Button, Clipboard, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import MeetingView from "./src/component/MeetingView";
 import { createMeeting, token } from "./api";
 import JoinScreen from "./src/component/JoinScreen";
 import { FirebaseService, NotifeeService, NotificationService } from "./src/notifications";
 import messaging from '@react-native-firebase/messaging';
 import notifee, { EventType } from '@notifee/react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Toast from "react-native-toast-message";
+import { showErrorToast, showSuccessToast, toastConfig } from "./src/helper/constants";
+import Colors from "./src/helper/Colors";
 
 const App = () => {
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
@@ -105,7 +109,8 @@ const App = () => {
     fetch(`http://192.168.1.37:3000/alarm`, {
       method: 'POST',
       body: JSON.stringify({
-        token: 'ed7J916-RA-AvCrBgYIJI-:APA91bGAvyf_XROthpiAeTzhtDXVjU3kTF-06nTNQ3ZFd68AnzJVVfG_IgEL6xuiwppvNpTeoZxsYXMNfVaWB-JdopQXA-tN0pSfxrWQObXiQuzG351f2Na5W2KS8bfWfissGMjqNP6I',
+        // token: 'ed7J916-RA-AvCrBgYIJI-:APA91bGAvyf_XROthpiAeTzhtDXVjU3kTF-06nTNQ3ZFd68AnzJVVfG_IgEL6xuiwppvNpTeoZxsYXMNfVaWB-JdopQXA-tN0pSfxrWQObXiQuzG351f2Na5W2KS8bfWfissGMjqNP6I',
+        token: 'dJ7OdVKgQribywNVzKesY8:APA91bHCGjh8PT3LJtMlc0JgWCHG4WIobl4s9DItV9aLeDBgXzhNMo4cl7UR8hJa-27Y6XQ6YgJ1bHsNy_0m0dFld0R3k5NrcHK4G3gECoPSbcU5gfO9vjTDUMq1K3F2zM881A2m-ulX',
         meetingId: meetingId
       })
     });
@@ -115,29 +120,45 @@ const App = () => {
   };
 
   return meetingId ? (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F6FF" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.WHITE }}>
       {isNotificationEnabled === false && (
         <View style={{ marginBottom: 20 }}>
           <Text>Notifications are currently disabled.</Text>
           <Button title="Enable Notifications" onPress={handleEnableNotifications} />
         </View>
       )}
-      <Text
-        style={{
-          alignSelf: "center",
-          fontSize: 22,
-          marginVertical: 16,
-          fontStyle: "italic",
-          color: "grey",
+      <TouchableOpacity style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+        onPress={() => {
+          Clipboard.setString(meetingId);
+          showSuccessToast(`Meeting Id copied Successfully`)
         }}
-      >{meetingId}</Text>
+      >
+        <Text
+          style={{
+            alignSelf: "center",
+            fontSize: 16,
+            marginVertical: 16,
+            color: Colors.TEXT_BLACK,
+          }}
+        >Meeting Id : {meetingId}</Text>
+        <Icon
+          size={20}
+          color={Colors.TEXT_BLACK}
+          style={{ marginStart: 10 }}
+          name={'content-copy'}
+        />
+      </TouchableOpacity>
       {/* {"Member" + participants.length} */}
       <MeetingProvider
         config={{
           meetingId,
           micEnabled: false,
           webcamEnabled: true,
-          name: "Test User",
+          name: name,
           notification: {
             title: "Video SDK Meeting",
             message: "Meeting is running.",
@@ -154,9 +175,13 @@ const App = () => {
           setParticipants={setParticipants}
         />
       </MeetingProvider>
+      <Toast position='top' config={toastConfig} topOffset={44} />
     </SafeAreaView>
   ) : (
-    <JoinScreen getMeetingId={getMeetingId} setIsHost={setIsHost} setName={setName} />
+    <View style={{ flex: 1 }}>
+      <JoinScreen getMeetingId={getMeetingId} setIsHost={setIsHost} setName={setName} />
+      <Toast position='top' config={toastConfig} topOffset={44} />
+    </View>
   );
 };
 export default App;

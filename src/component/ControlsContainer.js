@@ -1,6 +1,7 @@
 import { View, TouchableOpacity, Text } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Colors from "../helper/Colors";
 const Button = ({ onPress, buttonText, backgroundColor }) => {
     return (
         <TouchableOpacity
@@ -14,7 +15,7 @@ const Button = ({ onPress, buttonText, backgroundColor }) => {
                 marginTop: 5,
             }}
         >
-            <Text style={{ color: "white", fontSize: 12 }}>{buttonText}</Text>
+            <Text style={{ color: Colors.WHITE, fontSize: 12 }}>{buttonText}</Text>
         </TouchableOpacity>
     );
 };
@@ -44,13 +45,13 @@ const ControlsContainer = ({
             }}
         >
             {!isJoined ? (
-                <Button onPress={join} buttonText={"Join"} backgroundColor={"#1178F8"} />
+                <Button onPress={join} buttonText={"Join"} backgroundColor={Colors.BLUE} />
             ) : (
                 <>
                     <TouchableOpacity
                         onPress={toggleMic}
                         style={{
-                            backgroundColor: localMicOn ? "#1178F8" : "#FF0000",
+                            backgroundColor: localMicOn ? Colors.BLUE : Colors.RED,
                             justifyContent: "center",
                             alignItems: "center",
                             padding: 12,
@@ -60,7 +61,7 @@ const ControlsContainer = ({
                     >
                         <Icon
                             size={24}
-                            color="white"
+                            color={Colors.WHITE}
                             name={localMicOn ? "microphone" : "microphone-off"}
                         />
                     </TouchableOpacity>
@@ -68,7 +69,7 @@ const ControlsContainer = ({
                     <TouchableOpacity
                         onPress={toggleCamera}
                         style={{
-                            backgroundColor: "#1178F8",
+                            backgroundColor: Colors.BLUE,
                             justifyContent: "center",
                             alignItems: "center",
                             padding: 12,
@@ -78,7 +79,7 @@ const ControlsContainer = ({
                     >
                         <Icon
                             size={24}
-                            color="white"
+                            color={Colors.WHITE}
                             name={"camera-flip"}
                         />
                     </TouchableOpacity>
@@ -86,7 +87,7 @@ const ControlsContainer = ({
                     <TouchableOpacity
                         onPress={toggleWebcam}
                         style={{
-                            backgroundColor: localWebcamOn ? "#1178F8" : "#FF0000",
+                            backgroundColor: localWebcamOn ? Colors.BLUE : Colors.RED,
                             justifyContent: "center",
                             alignItems: "center",
                             padding: 12,
@@ -96,7 +97,7 @@ const ControlsContainer = ({
                     >
                         <Icon
                             size={24}
-                            color="white"
+                            color={Colors.WHITE}
                             name={localWebcamOn ? "video" : "video-off"}
                         />
                     </TouchableOpacity>
@@ -104,7 +105,7 @@ const ControlsContainer = ({
                     <TouchableOpacity
                         onPress={handleToggleScreenShare}
                         style={{
-                            backgroundColor: isScreenShare ? "#1178F8" : "#FF0000",
+                            backgroundColor: isScreenShare ? Colors.BLUE : Colors.RED,
                             justifyContent: "center",
                             alignItems: "center",
                             padding: 12,
@@ -114,7 +115,7 @@ const ControlsContainer = ({
                     >
                         <MaterialIcons
                             size={24}
-                            color="white"
+                            color={Colors.WHITE}
                             name={"present-to-all"}
                         />
                     </TouchableOpacity>
@@ -126,14 +127,14 @@ const ControlsContainer = ({
                     onPress={leaveForHolst}
                     // buttonText={isJoined ? "Leave" : "End"}
                     buttonText={"Leave"}
-                    backgroundColor={"#FF0000"}
+                    backgroundColor={Colors.RED}
                 />
             }
             <Button
                 onPress={leaveOrEnd}
                 // buttonText={isJoined ? "Leave" : "End"}
                 buttonText={!isHostTwo ? "Leave" : "End"}
-                backgroundColor={"#FF0000"}
+                backgroundColor={Colors.RED}
             />
         </View>
     );
