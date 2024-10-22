@@ -32,7 +32,9 @@ const ControlsContainer = ({
     isHost,
     toggleCamera,
     handleToggleScreenShare,
-    isScreenShare
+    isScreenShare,
+    isRecording,
+    handleRecording
 }) => {
     return (
         <View
@@ -116,6 +118,24 @@ const ControlsContainer = ({
                             size={24}
                             color="white"
                             name={"present-to-all"}
+                        />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={handleRecording}
+                        style={{
+                            backgroundColor: isRecording ? "#1178F8" : "#FF0000",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            padding: 12,
+                            borderRadius: 4,
+                            marginTop: 5,
+                        }}
+                    >
+                        <Icon
+                            size={24}
+                            color="white"
+                            name={"record-circle"}
                         />
                     </TouchableOpacity>
 

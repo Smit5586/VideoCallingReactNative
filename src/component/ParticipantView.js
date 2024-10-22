@@ -7,10 +7,15 @@ import {
 import { Text, View } from "react-native";
 
 const ParticipantView = ({ participantId }) => {
-    const { webcamStream, webcamOn, isLocal, isMainParticipant, participant,
-        screenShareStream, screenShareOn
+    const {
+        webcamStream,
+        webcamOn,
+        isLocal,
+        isMainParticipant,
+        participant,
+        screenShareStream,
+        screenShareOn
     } = useParticipant(participantId);
-    console.log("(webcamOn && webcamStream) || (screenShareOn && screenShareStream)", screenShareOn);
 
     return ((webcamOn && webcamStream) || (screenShareOn && screenShareStream)) ? (
         <RTCView
@@ -30,6 +35,8 @@ const ParticipantView = ({ participantId }) => {
                 height: 300,
                 justifyContent: "center",
                 alignItems: "center",
+                marginVertical: 8,
+                marginHorizontal: 8,
             }}
         >
             <Text style={{ fontSize: 16 }}>NO MEDIA</Text>

@@ -1,4 +1,4 @@
-import { useMeeting } from "@videosdk.live/react-native-sdk";
+import { Constants, ReactNativeForegroundService, useMeeting } from "@videosdk.live/react-native-sdk";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import ParticipantList from "./ParticipantList";
@@ -6,9 +6,14 @@ import ControlsContainer from "./ControlsContainer";
 
 let isUsingFrontCamera = true;
 const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
-    const { join, leave, toggleMic,
-        participants, end,
-        localMicOn, localWebcamOn,
+    const {
+        join,
+        leave,
+        toggleMic,
+        participants,
+        end,
+        localMicOn,
+        localWebcamOn,
         enableWebcam,
         disableWebcam,
         muteMic,
@@ -19,7 +24,9 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
         changeWebcam,
         enableScreenShare,
         disableScreenShare,
-
+        recordingState,
+        startRecording,
+        stopRecording,
     } = useMeeting({
         onMeetingLeft,
         onParticipantLeft
@@ -32,6 +39,13 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
         join();
         setIsJoined(true);
     };
+
+    useEffect(() => {
+        return () => {
+            leave();
+            ReactNativeForegroundService.stopAll();
+        };
+    }, []);
 
     useEffect(() => {
         setParticipants([...participants.keys()])
@@ -131,6 +145,41 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
     }
 
 
+    const handleRecording = () => {
+        console.log("recordingState", recordingState);
+
+        if (
+            !recordingState ||
+            recordingState === Constants.recordingEvents.RECORDING_STOPPED ||
+            recordingState === Constants.recordingEvents.RECORDING_STOPPING
+        ) {
+            // Configuration for post transcription
+            let transcription = {
+                enabled: true,
+                summary: {
+                    enabled: true,
+                    prompt:
+                        "Write summary in sections like Title, Agenda, Speakers, Action Items, Outlines, Notes and Summary",
+                },
+            };
+
+            // Start Recording
+            // If you don't have a `webhookUrl` or `awsDirPath`, you should pass null.
+            startRecording(
+                null,
+                null,
+                null,
+                transcription
+            );
+            // startRecording();
+        } else if (
+            recordingState === Constants.recordingEvents.RECORDING_STARTED ||
+            recordingState === Constants.recordingEvents.RECORDING_STARTING
+        ) {
+            stopRecording();
+        }
+    }
+
     return (
         <View style={{ flex: 1 }}>
             <ParticipantList participants={participantsArrId} localMicOn={localMicOn} name={name} />
@@ -148,6 +197,10 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
                 toggleCamera={toggleCamera}
                 handleToggleScreenShare={handleToggleScreenShare}
                 isScreenShare={isScreenShare}
+                handleRecording={handleRecording}
+                isRecording={(recordingState === Constants.recordingEvents.RECORDING_STARTED ||
+                    recordingState === Constants.recordingEvents.RECORDING_STOPPING ||
+                    recordingState === Constants.recordingEvents.RECORDING_STARTING) ? true : false}
             />
         </View>
     );
