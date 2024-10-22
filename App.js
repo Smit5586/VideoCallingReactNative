@@ -130,7 +130,8 @@ const App = () => {
           fontStyle: "italic",
           color: "grey",
         }}
-      >{meetingId} {"Member" + participants.length}</Text>
+      >{meetingId}</Text>
+      {/* {"Member" + participants.length} */}
       <MeetingProvider
         config={{
           meetingId,
