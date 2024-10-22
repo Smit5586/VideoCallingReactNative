@@ -31,10 +31,13 @@ const JoinScreen = (props) => {
             />
             <TouchableOpacity
                 onPress={() => {
-                    !nameVal ? showErrorToast("Please enter your name") :
+                    if (!nameVal) {
+                        showErrorToast("Please enter your name")
+                    } else {
                         props.setIsHost(true)
-                    props.getMeetingId();
-                    props.setName(nameVal)
+                        props.getMeetingId();
+                        props.setName(nameVal)
+                    }
                 }}
                 style={{ backgroundColor: Colors.BLUE, padding: 12, borderRadius: 6 }}
             >
@@ -73,11 +76,15 @@ const JoinScreen = (props) => {
                     borderRadius: 6,
                 }}
                 onPress={() => {
-                    !nameVal ? showErrorToast("Please enter your name") :
-                        !meetingVal ? showErrorToast("Please enter meeting id") :
-                            props.setIsHost(false);
-                    props.getMeetingId(meetingVal);
-                    props.setName(nameVal)
+                    if (!nameVal) {
+                        showErrorToast("Please enter your name")
+                    } else if (!meetingVal) {
+                        showErrorToast("Please enter meeting id")
+                    } else {
+                        props.setIsHost(false);
+                        props.getMeetingId(meetingVal);
+                        props.setName(nameVal)
+                    }
                 }}
             >
                 <Text style={{ color: Colors.WHITE, alignSelf: "center", fontSize: 18 }}>
