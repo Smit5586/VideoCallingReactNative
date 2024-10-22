@@ -1,8 +1,9 @@
 import { Constants, ReactNativeForegroundService, useMeeting } from "@videosdk.live/react-native-sdk";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Platform, Text, View } from "react-native";
 import ParticipantList from "./ParticipantList";
 import ControlsContainer from "./ControlsContainer";
+import { showErrorToast } from "../helper/constants";
 
 let isUsingFrontCamera = true;
 const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
@@ -27,9 +28,16 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
         recordingState,
         startRecording,
         stopRecording,
+        toggleScreenShare,
+        localScreenShareOn
+
     } = useMeeting({
         onMeetingLeft,
-        onParticipantLeft
+        onParticipantLeft,
+        onError: (data) => {
+            const { code, message } = data;
+            showErrorToast(`Error: ${code}: ${message}`)
+        },
     });
     const participantsArrId = [...participants.keys()];
     const [isJoined, setIsJoined] = useState(false);
@@ -50,6 +58,30 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
     useEffect(() => {
         setParticipants([...participants.keys()])
     }, [participants])
+
+    useEffect(() => {
+        if (localScreenShareOn) {
+            setIsScreenShare(true)
+        } else {
+            setIsScreenShare(false)
+        }
+    }, [localScreenShareOn])
+
+    useEffect(() => {
+        if (Platform.OS == "ios") {
+            VideosdkRPK.addListener("onScreenShare", (event) => {
+                if (event === "START_BROADCAST") {
+                    enableScreenShare();
+                } else if (event === "STOP_BROADCAST") {
+                    disableScreenShare();
+                }
+            });
+
+            return () => {
+                VideosdkRPK.removeSubscription("onScreenShare");
+            };
+        }
+    }, []);
 
     //Event to determine if the meeting has been left
     function onMeetingLeft() {
@@ -107,12 +139,15 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
     }
 
     const handleToggleScreenShare = () => {
-        if (isScreenShare) {
-            disableScreenShare()
-        } else {
-            enableScreenShare()
-        }
-        setIsScreenShare(!isScreenShare)
+        // if (isScreenShare) {
+        //     disableScreenShare()
+        // } else {
+        //     enableScreenShare()
+        // }
+        // setIsScreenShare(!isScreenShare)
+        Platform.OS === "android"
+            ? toggleScreenShare()
+            : VideosdkRPK.startBroadcast();
     };
 
     const toggleCamera = async () => {
