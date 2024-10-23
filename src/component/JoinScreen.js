@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaView, Text, TextInput, TouchableOpacity } from "react-native";
 import Toast from "react-native-toast-message";
 import { showErrorToast, showSuccessToast } from "../helper/constants";
@@ -8,6 +8,9 @@ const JoinScreen = (props) => {
     const [meetingVal, setMeetingVal] = useState("");
 
     const [nameVal, setNameVal] = useState("");
+    useEffect(() => {
+        props.setName(nameVal)
+    }, [nameVal])
     return (
         <SafeAreaView
             style={{
@@ -21,6 +24,7 @@ const JoinScreen = (props) => {
                 value={nameVal}
                 onChangeText={setNameVal}
                 placeholder={"Enter your name"}
+                placeholderTextColor={Colors.TEXT_GRAY}
                 style={{
                     marginBottom: 12,
                     padding: 12,
@@ -61,6 +65,7 @@ const JoinScreen = (props) => {
                 onChangeText={setMeetingVal}
                 // placeholder={"XXXX-XXXX-XXXX"}
                 placeholder={"Meeting Id"}
+                placeholderTextColor={Colors.TEXT_GRAY}
                 style={{
                     padding: 12,
                     borderWidth: 1,

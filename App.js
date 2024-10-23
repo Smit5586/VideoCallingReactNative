@@ -8,7 +8,7 @@ import {
 } from "@videosdk.live/react-native-sdk";
 import { Alert, Button, Clipboard, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import MeetingView from "./src/component/MeetingView";
-import { createMeeting, token } from "./api";
+import { createMeeting, token, validateMeeting } from "./api";
 import JoinScreen from "./src/component/JoinScreen";
 import { FirebaseService, NotifeeService, NotificationService } from "./src/notifications";
 import messaging from '@react-native-firebase/messaging';
@@ -47,17 +47,20 @@ const App = () => {
       // Handle notification opened while app is in background
       FirebaseService.onNotificationOpenedApp(remoteMessage => {
         const receivedMeetingId = remoteMessage?.data?.meetingId;
+        const name = remoteMessage?.data?.name;
         if (receivedMeetingId) {
           setMeetingId(receivedMeetingId);
           setIsHost(false)
+          setName(name);
         }
       });
 
       FirebaseService.checkInitialNotification().then(initialMessage => {
-        const { meetingId } = initialMessage?.data || {};
+        const { meetingId, name } = initialMessage?.data || {};
         if (meetingId) {
           setMeetingId(meetingId);
           setIsHost(false)
+          setName(name)
           // Alert.alert("Notification", `App opened from notification. Meeting ID: ${meetingId}`);
         }
       });
@@ -77,9 +80,11 @@ const App = () => {
         // Handle notification tap, navigate to a specific screen
         // You can extract the meetingId from the notification and set it
         const receivedMeetingId = notification?.data?.meetingId;
+        const name = notification?.data?.name;
         if (receivedMeetingId) {
           setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
           setIsHost(false);
+          setName(name);
         }
         await notifee.cancelNotification(notification.id);
       } else if (type === EventType.DISMISSED) {
@@ -103,18 +108,35 @@ const App = () => {
   };
 
   const getMeetingId = async (id) => {
-    const meetingId = id == null ? await createMeeting({ token }) : id;
-
-    //for sending notification start
-    fetch(`http://192.168.1.37:3000/alarm`, {
-      method: 'POST',
-      body: JSON.stringify({
-        // token: 'ed7J916-RA-AvCrBgYIJI-:APA91bGAvyf_XROthpiAeTzhtDXVjU3kTF-06nTNQ3ZFd68AnzJVVfG_IgEL6xuiwppvNpTeoZxsYXMNfVaWB-JdopQXA-tN0pSfxrWQObXiQuzG351f2Na5W2KS8bfWfissGMjqNP6I',
-        token: 'dJ7OdVKgQribywNVzKesY8:APA91bHCGjh8PT3LJtMlc0JgWCHG4WIobl4s9DItV9aLeDBgXzhNMo4cl7UR8hJa-27Y6XQ6YgJ1bHsNy_0m0dFld0R3k5NrcHK4G3gECoPSbcU5gfO9vjTDUMq1K3F2zM881A2m-ulX',
-        meetingId: meetingId
-      })
-    });
-    //for sending notification end 
+    // const meetingId = id == null ? await createMeeting({ token }) : id;
+    let meetingId = "";
+    if (id == null) {
+      meetingId = await createMeeting({ token })
+      // console.log("meetingId meetingId", meetingId);
+      // console.log("meetingId name", name);
+      // for sending notification start
+      fetch(`http://192.168.1.63:3000/alarm`, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: 'dmyQxOWRQOWcPns7WfKkF3:APA91bHgrB0nzNbYmJu4rTw90x-OYJUZ4EGqbCny26zXFJmz0NTGlFBJLBRq0xYzyMSnPLdJBC0HNO8456KTx2T_2tuxZeUtCHHv2c6nsMIOTVtyMCJ-KSWgAdbPp4T-PTb_-GKX3sOh',
+          meetingId: meetingId,
+          name: name
+        })
+      });
+      // for sending notification end 
+    } else {
+      // console.log("id.trim()", id.trim());
+      let valid = await validateMeeting({
+        meetingId: id.trim(),
+        token: token,
+      });
+      if (valid) {
+        meetingId = id;
+      } else {
+        showErrorToast("Please enter valid meeting id")
+        return
+      }
+    }
 
     setMeetingId(meetingId);
   };
