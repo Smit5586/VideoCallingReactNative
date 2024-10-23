@@ -22,6 +22,7 @@ import IncomingCallModal from "./src/component/IncomingCallModal";
 const App = () => {
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
   const [meetingId, setMeetingId] = useState(null);
+  const [meetingIdNotification, setMeetingIdNotification] = useState(null);
   const [participants, setParticipants] = useState([]);
 
   const [isHost, setIsHost] = useState(false);
@@ -35,12 +36,14 @@ const App = () => {
   };
 
   const handleAcceptCall = () => {
+    setMeetingId(meetingIdNotification);
     setModalVisible(false);
     // Handle accept call logic here
   };
 
   const handleDeclineCall = () => {
     setModalVisible(false);
+    setMeetingId(null)
     // Handle decline call logic here
   };
   useEffect(() => {
@@ -67,6 +70,7 @@ const App = () => {
         const name = remoteMessage?.data?.name;
         if (receivedMeetingId) {
           // setMeetingId(receivedMeetingId);
+          setMeetingIdNotification(receivedMeetingId);
           handleIncomingCall()
           setIsHost(false)
           setName(name);
@@ -77,6 +81,7 @@ const App = () => {
         const { meetingId, name } = initialMessage?.data || {};
         if (meetingId) {
           // setMeetingId(meetingId);
+          setMeetingIdNotification(meetingId);
           handleIncomingCall()
           setIsHost(false)
           setName(name)
@@ -103,6 +108,7 @@ const App = () => {
         if (receivedMeetingId) {
           handleIncomingCall()
           // setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
+          setMeetingIdNotification(receivedMeetingId);  // Automatically navigate to meeting
           setIsHost(false);
           setName(name);
         }
@@ -133,16 +139,16 @@ const App = () => {
     if (id == null) {
       meetingId = await createMeeting({ token })
       // console.log("meetingId meetingId", meetingId);
-      // console.log("meetingId name", name);
+      console.log("meetingId name", name);
       // for sending notification start
-      // fetch(`http://192.168.1.63:3000/alarm`, {
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     token: 'dmyQxOWRQOWcPns7WfKkF3:APA91bHgrB0nzNbYmJu4rTw90x-OYJUZ4EGqbCny26zXFJmz0NTGlFBJLBRq0xYzyMSnPLdJBC0HNO8456KTx2T_2tuxZeUtCHHv2c6nsMIOTVtyMCJ-KSWgAdbPp4T-PTb_-GKX3sOh',
-      //     meetingId: meetingId,
-      //     name: name
-      //   })
-      // });
+      fetch(`http://192.168.1.63:3000/alarm`, {
+        method: 'POST',
+        body: JSON.stringify({
+          token: 'dCI7pOYvQEmo7tmf7gNR-4:APA91bG93lYLdsNbUZOgo0WQuNxpL3-tnhEfs_0Y_QGaAa97VqT8HHLkPR2jwcAL55okyc-PU9nT7DCoo3HCTHM_pmYv7QmKB57NZ4kmItf0Ytz1QjwuMyU53Vy9shDyi8fffJRNIjpR',
+          meetingId: meetingId,
+          name: name
+        })
+      });
       // for sending notification end 
     } else {
       // console.log("id.trim()", id.trim());
@@ -249,6 +255,7 @@ const App = () => {
       visible={isModalVisible}
       onAccept={handleAcceptCall}
       onDecline={handleDeclineCall}
+      name={name}
     />
   </View>
 };

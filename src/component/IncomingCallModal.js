@@ -7,8 +7,10 @@ import {
     Modal,
     Animated,
 } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Colors from '../helper/Colors';
 
-const IncomingCallModal = ({ visible, onAccept, onDecline }) => {
+const IncomingCallModal = ({ visible, onAccept, onDecline, name }) => {
     const scaleAnim = new Animated.Value(0);
 
     useEffect(() => {
@@ -26,7 +28,7 @@ const IncomingCallModal = ({ visible, onAccept, onDecline }) => {
     return (
         <Modal
             transparent={true}
-            animationType="fade"
+            // animationType="fade"
             visible={visible}
         >
             <View style={styles.container}>
@@ -36,19 +38,49 @@ const IncomingCallModal = ({ visible, onAccept, onDecline }) => {
                         { transform: [{ scale: scaleAnim }] },
                     ]}
                 >
-                    <Text style={styles.callText}>Incoming Video Call</Text>
+                    <View style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}>
+                        <View style={{
+                            height: 100,
+                            width: 100,
+                            backgroundColor: Colors.TEXT_GRAY,
+                            borderRadius: 60,
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+                            <MaterialIcons
+                                size={60}
+                                color={Colors.WHITE}
+                                name={"person"}
+                            />
+                        </View>
+                        <Text style={styles.callText}>Incoming Video Call from {name}</Text>
+                    </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={[styles.button, styles.acceptButton]}
                             onPress={onAccept}
                         >
-                            <Text style={styles.buttonText}>Accept</Text>
+                            <MaterialIcons
+                                size={24}
+                                color={Colors.WHITE}
+                                name={"call"}
+                            />
+                            {/* <Text style={styles.buttonText}>Accept</Text> */}
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.button, styles.declineButton]}
                             onPress={onDecline}
                         >
-                            <Text style={styles.buttonText}>Decline</Text>
+                            <MaterialIcons
+                                size={24}
+                                color={Colors.WHITE}
+                                name={"close"}
+                            />
+                            {/* <Text style={styles.buttonText}>Decline</Text> */}
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
@@ -65,32 +97,47 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.7)',
     },
     modalView: {
-        width: '80%',
-        padding: 20,
-        borderRadius: 10,
+        // marginTop: 20,
+        width: '100%',
+        height: '100%',
+        padding: 16,
+        // borderRadius: 10,
         backgroundColor: 'white',
-        alignItems: 'center',
+        // alignItems: 'center',
         elevation: 5,
     },
     callText: {
-        fontSize: 24,
-        marginBottom: 20,
+        fontSize: 16,
+        marginTop: 20,
+        fontWeight: "bold"
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
         width: '100%',
     },
     button: {
-        padding: 15,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
         borderRadius: 5,
-        width: '45%',
+        width: '30%',
     },
     acceptButton: {
         backgroundColor: '#28a745',
+        borderRadius: 30,
+        width: 50,
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center"
     },
     declineButton: {
         backgroundColor: '#dc3545',
+        borderRadius: 30,
+        width: 50,
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center"
     },
     buttonText: {
         color: 'white',
