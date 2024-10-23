@@ -50,7 +50,6 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
 
     useEffect(() => {
         return () => {
-            leave();
             ReactNativeForegroundService.stopAll();
         };
     }, []);
