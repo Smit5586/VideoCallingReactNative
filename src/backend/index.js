@@ -13,7 +13,7 @@ admin.initializeApp({
 });
 
 // Remote Push Notification
-async function sendAlarmNotification(token, meetingId) {
+async function sendAlarmNotification(token, meetingId, name) {
     return admin.messaging().send({
         token,
         notification: {
@@ -24,7 +24,8 @@ async function sendAlarmNotification(token, meetingId) {
             type: "alarmNotification",
             meetingId: meetingId,
             title: `Meeting(${meetingId}) is started`,
-            body: "Please join the meeting"
+            body: "Please join the meeting",
+            name: name
         },
     });
 }
@@ -54,8 +55,9 @@ fastify.post("/notifications", async (request) => {
 
 // Declare a alarm route
 fastify.post("/alarm", async (request) => {
+    console.log("alarm request", request.body);
     await delay(5000);
-    await sendAlarmNotification(JSON.parse(request.body).token, JSON.parse(request.body).meetingId);
+    await sendAlarmNotification(JSON.parse(request.body).token, JSON.parse(request.body).meetingId, JSON.parse(request.body).name);
     return "OK";
 });
 
@@ -65,6 +67,7 @@ const start = async () => {
         await fastify.listen({ port: 3000, host: '0.0.0.0' });
         fastify.log.info(`Server is running on http://localhost:3000`);
     } catch (err) {
+        console.log("BACKEND ERROR", err);
         fastify.log.error(err);
         process.exit(1);
     }
