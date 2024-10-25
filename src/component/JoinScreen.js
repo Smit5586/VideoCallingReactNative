@@ -17,7 +17,6 @@ const JoinScreen = (props) => {
                 flex: 1,
                 backgroundColor: Colors.WHITE,
                 justifyContent: "center",
-                paddingHorizontal: 6 * 10,
             }}
         >
             <TextInput

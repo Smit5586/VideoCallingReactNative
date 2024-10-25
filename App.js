@@ -6,7 +6,7 @@ import {
   RTCView,
   MediaStream,
 } from "@videosdk.live/react-native-sdk";
-import { Alert, Button, Clipboard, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Button, Clipboard, PermissionsAndroid, Platform, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import MeetingView from "./src/component/MeetingView";
 import { createMeeting, token, validateMeeting } from "./api";
 import JoinScreen from "./src/component/JoinScreen";
@@ -18,6 +18,40 @@ import Toast from "react-native-toast-message";
 import { showErrorToast, showSuccessToast, toastConfig } from "./src/helper/constants";
 import Colors from "./src/helper/Colors";
 import IncomingCallModal from "./src/component/IncomingCallModal";
+import RNCallKeep from "react-native-callkeep";
+
+const options = {
+  ios: {
+    appName: 'videoAppDemo',
+    supportsVideo: true, // Enable video call support
+    maximumCallGroups: 1, // Limit of ongoing call groups
+    maximumCallsPerCallGroup: 1, // Limit of ongoing calls in each group
+  },
+  android: {
+    alertTitle: 'Permissions required',
+    alertDescription: 'This application needs to access your phone accounts',
+    cancelButton: 'Cancel',
+    okButton: 'OK',
+    imageName: 'phone_account_icon',
+    additionalPermissions: [
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+    ],
+    foregroundService: {
+      channelId: 'com.videoAppDemo',
+      channelName: 'Foreground service for my app',
+      notificationTitle: 'My app is running in the background',
+      notificationIcon: 'ic_notification', // Make sure the icon is added in your project
+    },
+  }
+};
+
+// CallKeep Setup
+RNCallKeep.setup(options).then((accepted) => {
+  console.log('RNCallKeep setup accepted:', accepted);
+});
 
 const App = () => {
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
@@ -141,14 +175,14 @@ const App = () => {
       // console.log("meetingId meetingId", meetingId);
       console.log("meetingId name", name);
       // for sending notification start
-      fetch(`http://192.168.1.63:3000/alarm`, {
-        method: 'POST',
-        body: JSON.stringify({
-          token: 'dCI7pOYvQEmo7tmf7gNR-4:APA91bG93lYLdsNbUZOgo0WQuNxpL3-tnhEfs_0Y_QGaAa97VqT8HHLkPR2jwcAL55okyc-PU9nT7DCoo3HCTHM_pmYv7QmKB57NZ4kmItf0Ytz1QjwuMyU53Vy9shDyi8fffJRNIjpR',
-          meetingId: meetingId,
-          name: name
-        })
-      });
+      // fetch(`http://192.168.1.63:3000/alarm`, {
+      //   method: 'POST',
+      //   body: JSON.stringify({
+      //     token: 'dCI7pOYvQEmo7tmf7gNR-4:APA91bG93lYLdsNbUZOgo0WQuNxpL3-tnhEfs_0Y_QGaAa97VqT8HHLkPR2jwcAL55okyc-PU9nT7DCoo3HCTHM_pmYv7QmKB57NZ4kmItf0Ytz1QjwuMyU53Vy9shDyi8fffJRNIjpR',
+      //     meetingId: meetingId,
+      //     name: name
+      //   })
+      // });
       // for sending notification end 
     } else {
       // console.log("id.trim()", id.trim());
@@ -183,6 +217,17 @@ const App = () => {
     //     console.error('Error showing incoming call notification:', error);
     //   });
   }
+
+  const onIncomingCall = (callerName, callUUID) => {
+    RNCallKeep.displayIncomingCall(
+      '3elb-qdz1-q9cl',     // UUID for the call
+      'user@example.com',     // Handle (could be phone number, email, etc.)
+      'John Doe',             // Localized name of the caller (optional)
+      'email',                // Handle type (e.g., 'number', 'email')
+      true,
+      null
+    );
+  };
 
   return <View style={{ flex: 1 }}>
     {meetingId ?
@@ -245,10 +290,10 @@ const App = () => {
         <Toast position='top' config={toastConfig} topOffset={10} />
       </SafeAreaView>
       :
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingHorizontal: 30, backgroundColor: Colors.WHITE }}>
         <JoinScreen getMeetingId={getMeetingId} setIsHost={setIsHost} setName={setName} />
         <Toast position='top' config={toastConfig} topOffset={44} />
-        {/* <Button title="Show notification" onPress={handleNotifications} /> */}
+        <Button title="Show notification" onPress={() => onIncomingCall("Manish", "3elb-qdz1-q9cl")} />
       </View>
     }
     <IncomingCallModal
