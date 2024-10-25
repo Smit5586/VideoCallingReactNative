@@ -16,10 +16,10 @@ admin.initializeApp({
 async function sendAlarmNotification(token, meetingId, name) {
     return admin.messaging().send({
         token,
-        notification: {
-            body: "Please join the meeting",
-            title: `Meeting(${meetingId}) is started`,
-        },
+        // notification: {
+        //     body: "Please join the meeting",
+        //     title: `Meeting(${meetingId}) is started`,
+        // },
         data: {
             type: "alarmNotification",
             meetingId: meetingId,
@@ -27,6 +27,10 @@ async function sendAlarmNotification(token, meetingId, name) {
             body: "Please join the meeting",
             name: name
         },
+        android: {
+            priority: "high"
+        },
+        // "content_available": true
     });
 }
 
