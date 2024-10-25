@@ -19,6 +19,7 @@ import { showErrorToast, showSuccessToast, toastConfig } from "./src/helper/cons
 import Colors from "./src/helper/Colors";
 import IncomingCallModal from "./src/component/IncomingCallModal";
 import RNCallKeep from "react-native-callkeep";
+import useIncomingCall from "./src/component/CallKeepComponent";
 
 const options = {
   ios: {
@@ -64,9 +65,9 @@ const App = () => {
   const [isModalVisible, setModalVisible] = useState(false);
 
   const handleIncomingCall = () => {
-    setTimeout(() => {
-      setModalVisible(true);
-    }, 1000);
+    // setTimeout(() => {
+    setModalVisible(true);
+    // }, 1000);
   };
 
   const handleAcceptCall = () => {
@@ -221,13 +222,40 @@ const App = () => {
   const onIncomingCall = (callerName, callUUID) => {
     RNCallKeep.displayIncomingCall(
       '3elb-qdz1-q9cl',     // UUID for the call
-      'user@example.com',     // Handle (could be phone number, email, etc.)
+      '1234567890',     // Handle (could be phone number, email, etc.)
       'John Doe',             // Localized name of the caller (optional)
-      'email',                // Handle type (e.g., 'number', 'email')
+      'number',                // Handle type (e.g., 'number', 'email')
       true,
       null
     );
   };
+
+  const {
+    displayIncomingCall,
+    startCall,
+    reportEndCallWithUUID,
+    endIncomingcallAnswer,
+    endAllCalls,
+    backToForeground,
+    configure
+  } = useIncomingCall();
+
+  const incomingCallAnswer = ({ callUUID }) => {
+    backToForeground();
+    endIncomingcallAnswer(callUUID);
+    setModalVisible(true)
+  }
+
+  const endIncomingCall = () => {
+    endIncomingcallAnswer();
+  }
+
+  const callInitialized = () => {
+    configure(incomingCallAnswer, endIncomingCall);
+    displayIncomingCall("John");
+  }
+
+
 
   return <View style={{ flex: 1 }}>
     {meetingId ?
@@ -294,6 +322,13 @@ const App = () => {
         <JoinScreen getMeetingId={getMeetingId} setIsHost={setIsHost} setName={setName} />
         <Toast position='top' config={toastConfig} topOffset={44} />
         <Button title="Show notification" onPress={() => onIncomingCall("Manish", "3elb-qdz1-q9cl")} />
+        <View>
+          <Text>Incoming Call Screen</Text>
+          <Button title="Display Incoming Call" onPress={() => callInitialized()} />
+          <Button title="Start Call" onPress={() => startCall({ handle: "123456789", localizedCallerName: "Caller Name" })} />
+          <Button title="End Call" onPress={endIncomingcallAnswer} />
+          <Button title="End All Calls" onPress={endAllCalls} />
+        </View>
       </View>
     }
     <IncomingCallModal
