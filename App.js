@@ -98,7 +98,8 @@ const App = () => {
       //   }
       // });
 
-      NotificationService.listenForegroundMessages()
+      NotificationService.listenBackgroundMessages(callInitialized);
+      NotificationService.listenForegroundMessages(callInitialized)
       // Handle notification opened while app is in background
       FirebaseService.onNotificationOpenedApp(remoteMessage => {
         const receivedMeetingId = remoteMessage?.data?.meetingId;
@@ -130,34 +131,34 @@ const App = () => {
     handleNotifications();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
-      const { notification } = detail;
+  // useEffect(() => {
+  //   const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
+  //     const { notification } = detail;
 
-      if (type === EventType.PRESS) {
-        console.log('Notification pressed:', notification);
-        // Handle notification tap, navigate to a specific screen
-        // You can extract the meetingId from the notification and set it
-        const receivedMeetingId = notification?.data?.meetingId;
-        const name = notification?.data?.name;
-        if (receivedMeetingId) {
-          handleIncomingCall()
-          // setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
-          setMeetingIdNotification(receivedMeetingId);  // Automatically navigate to meeting
-          setIsHost(false);
-          setName(name);
-        }
-        await notifee.cancelNotification(notification.id);
-      } else if (type === EventType.DISMISSED) {
-        console.log('Notification dismissed:', notification);
-      }
-    });
+  //     if (type === EventType.PRESS) {
+  //       console.log('Notification pressed:', notification);
+  //       // Handle notification tap, navigate to a specific screen
+  //       // You can extract the meetingId from the notification and set it
+  //       const receivedMeetingId = notification?.data?.meetingId;
+  //       const name = notification?.data?.name;
+  //       if (receivedMeetingId) {
+  //         handleIncomingCall()
+  //         // setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
+  //         setMeetingIdNotification(receivedMeetingId);  // Automatically navigate to meeting
+  //         setIsHost(false);
+  //         setName(name);
+  //       }
+  //       await notifee.cancelNotification(notification.id);
+  //     } else if (type === EventType.DISMISSED) {
+  //       console.log('Notification dismissed:', notification);
+  //     }
+  //   });
 
-    return () => {
-      // Unsubscribe from foreground event when component is unmounted
-      unsubscribe();
-    };
-  }, []);
+  //   return () => {
+  //     // Unsubscribe from foreground event when component is unmounted
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   const handleEnableNotifications = async () => {
     const permissionGranted = await NotificationService.initialize();
@@ -179,7 +180,8 @@ const App = () => {
       // fetch(`http://192.168.1.63:3000/alarm`, {
       //   method: 'POST',
       //   body: JSON.stringify({
-      //     token: 'dCI7pOYvQEmo7tmf7gNR-4:APA91bG93lYLdsNbUZOgo0WQuNxpL3-tnhEfs_0Y_QGaAa97VqT8HHLkPR2jwcAL55okyc-PU9nT7DCoo3HCTHM_pmYv7QmKB57NZ4kmItf0Ytz1QjwuMyU53Vy9shDyi8fffJRNIjpR',
+      //     // token: 'dCI7pOYvQEmo7tmf7gNR-4:APA91bG93lYLdsNbUZOgo0WQuNxpL3-tnhEfs_0Y_QGaAa97VqT8HHLkPR2jwcAL55okyc-PU9nT7DCoo3HCTHM_pmYv7QmKB57NZ4kmItf0Ytz1QjwuMyU53Vy9shDyi8fffJRNIjpR',
+      //     token: 'cJEOC7VKSrS1LItyFCDXDa:APA91bEqfkdel5DFXEQ7RJoHiKR1qU594YUk2CDKPcgNDhOe9d8WDUQcB4VzI0VsGBWaRLtZWkt9DyuEZF-GtyWcDx9zA0aNRD_xu-SfzNsr8OA75Q-2EE36h9J9JKIIymvJzurp5aOz',
       //     meetingId: meetingId,
       //     name: name
       //   })
@@ -241,18 +243,22 @@ const App = () => {
   } = useIncomingCall();
 
   const incomingCallAnswer = ({ callUUID }) => {
+    console.log("incomingCallAnswer");
+
     backToForeground();
     endIncomingcallAnswer(callUUID);
     setModalVisible(true)
   }
 
   const endIncomingCall = () => {
+    console.log("endIncomingCall");
     endIncomingcallAnswer();
   }
 
   const callInitialized = () => {
     configure(incomingCallAnswer, endIncomingCall);
     displayIncomingCall("John");
+    backToForeground();
   }
 
 

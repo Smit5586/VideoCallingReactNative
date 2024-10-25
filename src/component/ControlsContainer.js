@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text, Platform } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Colors from "../helper/Colors";
@@ -104,7 +104,7 @@ const ControlsContainer = ({
                         />
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {Platform.OS == "android" && <TouchableOpacity
                         onPress={handleToggleScreenShare}
                         style={{
                             backgroundColor: isScreenShare ? Colors.BLUE : Colors.RED,
@@ -120,7 +120,7 @@ const ControlsContainer = ({
                             color={Colors.WHITE}
                             name={"present-to-all"}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
 
                     <TouchableOpacity
                         onPress={handleRecording}

@@ -36,17 +36,18 @@ const NotificationService = {
         }
     },
 
-    listenBackgroundMessages: () => {
+    listenBackgroundMessages: (callback) => {
         // Background messages handler
         messaging().setBackgroundMessageHandler(async remoteMessage => {
             console.log('Message handled in the background!', remoteMessage);
+            callback(remoteMessage);
         });
     },
 
-    listenForegroundMessages: () => {
+    listenForegroundMessages: (callback) => {
         // Foreground notifications handler
         FirebaseService.onForegroundNotification(remoteMessage => {
-            NotifeeService.displayNotification(remoteMessage);
+            callback(remoteMessage);
         });
     }
 };
