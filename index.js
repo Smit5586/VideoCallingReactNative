@@ -45,8 +45,8 @@ import messaging from '@react-native-firebase/messaging';
 import RNCallKeep from 'react-native-callkeep';
 import Incomingvideocall from './src/component/CallKeepComponent';
 import { useContext, useEffect } from 'react';
-import { ModalContext, ModalProvider } from './src/component/ModalContext';
-import { showModal } from './src/component/ModalManager';
+import { ModalContext, ModalProvider, updateMeetingIdExternally, useMeeting } from './src/component/ModalContext';
+import { showModal, hideModal } from './src/component/ModalManager';
 
 // Initialize Video SDK
 register();
@@ -65,7 +65,8 @@ const firebaseListener = async (initialMessage) => {
         console.log('Incoming call answered');
         Incomingvideocall.backToForeground();
         Incomingvideocall.endIncomingcallAnswer(callUUID);
-        // showModal();
+        hideModal()
+        updateMeetingIdExternally(meetingId);
     };
 
     const endIncomingCall = () => {
@@ -73,13 +74,16 @@ const firebaseListener = async (initialMessage) => {
         Incomingvideocall.endIncomingcallAnswer();
     };
 
-    // const callInitialized = () => {
+
     const { meetingId, name } = initialMessage?.data || {};
     const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
     Incomingvideocall.configure(answerHandler, endIncomingCall);
     Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground()
-    // };
+    setTimeout(() => {
+        showModal();
+    }, 300);
+
 };
 
 messaging().setBackgroundMessageHandler(firebaseListener);

@@ -9,7 +9,10 @@ export const setModalRef = (ref) => {
 };
 
 export const showModal = () => {
+    console.log("current 1");
+
     if (modalRef.current) {
+        console.log("current 2");
         modalRef.current(true);  // Set modal to visible
     }
 };

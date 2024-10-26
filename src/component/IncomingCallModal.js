@@ -58,7 +58,7 @@ const IncomingCallModal = ({ visible, onAccept, onDecline, name, hideModal }) =>
                                 name={"person"}
                             />
                         </View>
-                        <Text style={styles.callText}>Incoming Video Call from {name}</Text>
+                        <Text style={styles.callText}>Incoming Video Call</Text>
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity

@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   MeetingProvider,
-  useMeeting,
   useParticipant,
   RTCView,
   MediaStream,
@@ -20,7 +19,8 @@ import Colors from "./src/helper/Colors";
 import IncomingCallModal from "./src/component/IncomingCallModal";
 import RNCallKeep from "react-native-callkeep";
 import Incomingvideocall from "./src/component/CallKeepComponent";
-import { ModalContext } from "./src/component/ModalContext";
+import { ModalContext, useMeeting } from "./src/component/ModalContext";
+import { showModal } from "./src/component/ModalManager";
 
 const options = {
   ios: {
@@ -56,8 +56,9 @@ RNCallKeep.setup(options).then((accepted) => {
 });
 
 const App = () => {
+  const { meetingId, setMeetingId } = useMeeting();
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(null);
-  const [meetingId, setMeetingId] = useState(null);
+  // const [meetingId, setMeetingId] = useState(null);
   const [meetingIdNotification, setMeetingIdNotification] = useState(null);
   const [participants, setParticipants] = useState([]);
 
@@ -248,6 +249,7 @@ const App = () => {
 
     Incomingvideocall.backToForeground();
     Incomingvideocall.endIncomingcallAnswer(callUUID);
+    hideModal()
     if (meetingId) {
       setIsHost(false)
       setMeetingId(meetingId)
@@ -258,6 +260,7 @@ const App = () => {
   const endIncomingCall = () => {
     console.log("endIncomingCall");
     Incomingvideocall.endIncomingcallAnswer();
+    hideModal()
   }
 
   const callInitialized = (initialMessage) => {
@@ -267,6 +270,7 @@ const App = () => {
     Incomingvideocall.configure(answerHandler, endIncomingCall);
     Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground();
+    showModal();
   }
 
 
