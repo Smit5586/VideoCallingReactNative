@@ -98,7 +98,7 @@ const App = () => {
       //   }
       // });
 
-      NotificationService.listenBackgroundMessages(callInitialized);
+      // NotificationService.listenBackgroundMessages(callInitialized);
       NotificationService.listenForegroundMessages(callInitialized)
       // Handle notification opened while app is in background
       FirebaseService.onNotificationOpenedApp(remoteMessage => {

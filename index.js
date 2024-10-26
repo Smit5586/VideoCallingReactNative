@@ -43,36 +43,50 @@ import { name as appName } from './app.json';
 import { register } from '@videosdk.live/react-native-sdk';
 import messaging from '@react-native-firebase/messaging';
 import RNCallKeep from 'react-native-callkeep';
+import useIncomingCall from './src/component/CallKeepComponent';
+import { useEffect } from 'react';
 
 // Initialize Video SDK
 register();
 
-RNCallKeep.setup({
-    ios: {
-        appName: 'videoAppDemo',
-        supportsVideo: true,
-    },
-    android: {
-        alertTitle: 'Permissions required',
-        alertDescription: 'This app needs access to your phone state',
-        cancelButton: 'Cancel',
-        okButton: 'OK',
-    },
-});
 
-// Background message handler to bring app to foreground when a notification arrives
-messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-    console.log('Message handled in the background!', remoteMessage);
+const firebaseListener = async (remoteMessage) => {
+    const {
+        displayIncomingCall,
+        backToForeground,
+        configure,
+        endIncomingcallAnswer,
+    } = useIncomingCall();
 
-    // Use RNCallKeep to bring the app to the foreground
-    // RNCallKeep.backToForeground();
-    // RNCallKeep.displayIncomingCall(callUUID, callerName, callerName, 'generic', true);
-    RNCallKeep.displayIncomingCall('d8sr-dds5-gv54', 'manish', 'manish', 'generic', true);
-    // RNCallKeep.backToForeground();
-});
+    const incomingCallAnswer = ({ callUUID }) => {
+        console.log('Incoming call answered');
+        backToForeground();
+        endIncomingcallAnswer(callUUID);
+    };
 
-// Register the main application component
-AppRegistry.registerComponent(appName, () => App);
+    const endIncomingCall = () => {
+        console.log('Incoming call ended');
+        endIncomingcallAnswer();
+    };
+
+    // const callInitialized = () => {
+    configure(incomingCallAnswer, endIncomingCall);
+    displayIncomingCall('John');
+    backToForeground()
+    // };
+};
+
+messaging().setBackgroundMessageHandler(firebaseListener);
+
+function HeadlessCheck({ isHeadless }) {
+    if (isHeadless) {
+        // App has been launched in the background by iOS, ignore
+        return null;
+    }
+
+    return <App />;
+}
+AppRegistry.registerComponent(appName, () => HeadlessCheck);
 
 // Register any additional background task (optional) for handling background call events
 AppRegistry.registerHeadlessTask('RNCallKeepBackgroundMessage', () => async ({ name, callUUID, handle }) => {
