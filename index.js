@@ -44,13 +44,16 @@ import { register } from '@videosdk.live/react-native-sdk';
 import messaging from '@react-native-firebase/messaging';
 import RNCallKeep from 'react-native-callkeep';
 import Incomingvideocall from './src/component/CallKeepComponent';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
+import { ModalContext, ModalProvider } from './src/component/ModalContext';
+import { showModal } from './src/component/ModalManager';
 
 // Initialize Video SDK
 register();
 
 
-const firebaseListener = async (remoteMessage) => {
+const firebaseListener = async (initialMessage) => {
+    // const { showModal } = useContext(ModalContext);
     // const {
     //     displayIncomingCall,
     //     backToForeground,
@@ -58,10 +61,11 @@ const firebaseListener = async (remoteMessage) => {
     //     endIncomingcallAnswer,
     // } = useIncomingCall();
 
-    const incomingCallAnswer = ({ callUUID }) => {
+    const incomingCallAnswer = ({ callUUID, meetingId }) => {
         console.log('Incoming call answered');
         Incomingvideocall.backToForeground();
         Incomingvideocall.endIncomingcallAnswer(callUUID);
+        // showModal();
     };
 
     const endIncomingCall = () => {
@@ -70,8 +74,10 @@ const firebaseListener = async (remoteMessage) => {
     };
 
     // const callInitialized = () => {
-    Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
-    Incomingvideocall.displayIncomingCall('John');
+    const { meetingId, name } = initialMessage?.data || {};
+    const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
+    Incomingvideocall.configure(answerHandler, endIncomingCall);
+    Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground()
     // };
 };
@@ -84,7 +90,11 @@ function HeadlessCheck({ isHeadless }) {
         return null;
     }
 
-    return <App />;
+    return (
+        <ModalProvider>
+            <App />
+        </ModalProvider>
+    );
 }
 AppRegistry.registerComponent(appName, () => HeadlessCheck);
 

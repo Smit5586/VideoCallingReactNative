@@ -10,7 +10,7 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../helper/Colors';
 
-const IncomingCallModal = ({ visible, onAccept, onDecline, name }) => {
+const IncomingCallModal = ({ visible, onAccept, onDecline, name, hideModal }) => {
     const scaleAnim = new Animated.Value(0);
 
     useEffect(() => {
@@ -28,8 +28,9 @@ const IncomingCallModal = ({ visible, onAccept, onDecline, name }) => {
     return (
         <Modal
             transparent={true}
-            // animationType="fade"
             visible={visible}
+            onRequestClose={hideModal}
+            animationType="slide"
         >
             <View style={styles.container}>
                 <Animated.View

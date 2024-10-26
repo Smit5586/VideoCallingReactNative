@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { PermissionsAndroid, Platform } from "react-native";
 import RNCallKeep from "react-native-callkeep";
 import uuid from "react-native-uuid";
 // import VoipPushNotification from "react-native-voip-push-notification";
@@ -21,20 +21,36 @@ class IncomingCall {
 
     setupCallKeep = () => {
         try {
-            RNCallKeep.setup({
+            const options = {
                 ios: {
-                    appName: "VideoSDK",
-                    supportsVideo: false,
-                    maximumCallGroups: "1",
-                    maximumCallsPerCallGroup: "1",
+                    appName: 'videoAppDemo',
+                    supportsVideo: true, // Enable video call support
+                    maximumCallGroups: 1, // Limit of ongoing call groups
+                    maximumCallsPerCallGroup: 1, // Limit of ongoing calls in each group
                 },
                 android: {
-                    alertTitle: "Permissions required",
-                    alertDescription:
-                        "This application needs to access your phone accounts",
-                    cancelButton: "Cancel",
-                    okButton: "Ok",
-                },
+                    alertTitle: 'Permissions required',
+                    alertDescription: 'This application needs to access your phone accounts',
+                    cancelButton: 'Cancel',
+                    okButton: 'OK',
+                    imageName: 'phone_account_icon',
+                    additionalPermissions: [
+                        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+                        PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+                        PermissionsAndroid.PERMISSIONS.CAMERA,
+                        PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+                    ],
+                    foregroundService: {
+                        channelId: 'com.videoAppDemo',
+                        channelName: 'Foreground service for my app',
+                        notificationTitle: 'My app is running in the background',
+                        notificationIcon: 'ic_notification', // Make sure the icon is added in your project
+                    },
+                }
+            };
+
+            RNCallKeep.setup(options).then((accepted) => {
+                console.log('RNCallKeep setup accepted:', accepted);
             });
         } catch (error) {
             console.error("initializeCallKeep error:", error?.message);

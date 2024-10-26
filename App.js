@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   MeetingProvider,
   useMeeting,
@@ -20,13 +20,14 @@ import Colors from "./src/helper/Colors";
 import IncomingCallModal from "./src/component/IncomingCallModal";
 import RNCallKeep from "react-native-callkeep";
 import Incomingvideocall from "./src/component/CallKeepComponent";
+import { ModalContext } from "./src/component/ModalContext";
 
 const options = {
   ios: {
     appName: 'videoAppDemo',
-    supportsVideo: true, // Enable video call support
-    maximumCallGroups: 1, // Limit of ongoing call groups
-    maximumCallsPerCallGroup: 1, // Limit of ongoing calls in each group
+    supportsVideo: true,
+    maximumCallGroups: 1,
+    maximumCallsPerCallGroup: 1,
   },
   android: {
     alertTitle: 'Permissions required',
@@ -62,22 +63,22 @@ const App = () => {
 
   const [isHost, setIsHost] = useState(false);
   const [name, setName] = useState("");
-  const [isModalVisible, setModalVisible] = useState(false);
-
+  // const [isModalVisible, setModalVisible] = useState(false);
+  const { isModalVisible, hideModal } = useContext(ModalContext);
   const handleIncomingCall = () => {
     // setTimeout(() => {
-    setModalVisible(true);
+    // setModalVisible(true);
     // }, 1000);
   };
 
   const handleAcceptCall = () => {
     setMeetingId(meetingIdNotification);
-    setModalVisible(false);
+    // setModalVisible(false);
     // Handle accept call logic here
   };
 
   const handleDeclineCall = () => {
-    setModalVisible(false);
+    // setModalVisible(false);
     setMeetingId(null)
     // Handle decline call logic here
   };
@@ -242,12 +243,16 @@ const App = () => {
   //   configure
   // } = useIncomingCall();
 
-  const incomingCallAnswer = ({ callUUID }) => {
-    console.log("incomingCallAnswer");
+  const incomingCallAnswer = ({ callUUID, meetingId = '' }) => {
+    console.log("incomingCallAnswer", callUUID, meetingId);
 
     Incomingvideocall.backToForeground();
     Incomingvideocall.endIncomingcallAnswer(callUUID);
-    setModalVisible(true)
+    if (meetingId) {
+      setIsHost(false)
+      setMeetingId(meetingId)
+    }
+    // setModalVisible(true)
   }
 
   const endIncomingCall = () => {
@@ -255,11 +260,12 @@ const App = () => {
     Incomingvideocall.endIncomingcallAnswer();
   }
 
-  const callInitialized = () => {
+  const callInitialized = (initialMessage) => {
     console.log("cccccc");
-
-    Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
-    Incomingvideocall.displayIncomingCall("John");
+    const { meetingId, name } = initialMessage?.data || {};
+    const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
+    Incomingvideocall.configure(answerHandler, endIncomingCall);
+    Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground();
   }
 
@@ -344,6 +350,7 @@ const App = () => {
       onAccept={handleAcceptCall}
       onDecline={handleDeclineCall}
       name={name}
+      hideModal={hideModal}
     />
   </View>
 };
