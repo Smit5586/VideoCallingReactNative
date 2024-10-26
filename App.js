@@ -73,13 +73,16 @@ const App = () => {
   };
 
   const handleAcceptCall = () => {
-    setMeetingId(meetingIdNotification);
+    Incomingvideocall.endIncomingcallAnswer()
+    setMeetingId(meetingIdNotification)
+    // setMeetingId(meetingIdNotification);
     // setModalVisible(false);
     // Handle accept call logic here
   };
 
   const handleDeclineCall = () => {
     // setModalVisible(false);
+    Incomingvideocall.endIncomingcallAnswer()
     setMeetingId(null)
     // Handle decline call logic here
   };
@@ -270,6 +273,7 @@ const App = () => {
     Incomingvideocall.configure(answerHandler, endIncomingCall);
     Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground();
+    setMeetingIdNotification(meetingId)
     showModal();
   }
 
