@@ -43,7 +43,7 @@ import { name as appName } from './app.json';
 import { register } from '@videosdk.live/react-native-sdk';
 import messaging from '@react-native-firebase/messaging';
 import RNCallKeep from 'react-native-callkeep';
-import useIncomingCall from './src/component/CallKeepComponent';
+import Incomingvideocall from './src/component/CallKeepComponent';
 import { useEffect } from 'react';
 
 // Initialize Video SDK
@@ -51,28 +51,28 @@ register();
 
 
 const firebaseListener = async (remoteMessage) => {
-    const {
-        displayIncomingCall,
-        backToForeground,
-        configure,
-        endIncomingcallAnswer,
-    } = useIncomingCall();
+    // const {
+    //     displayIncomingCall,
+    //     backToForeground,
+    //     configure,
+    //     endIncomingcallAnswer,
+    // } = useIncomingCall();
 
     const incomingCallAnswer = ({ callUUID }) => {
         console.log('Incoming call answered');
-        backToForeground();
-        endIncomingcallAnswer(callUUID);
+        Incomingvideocall.backToForeground();
+        Incomingvideocall.endIncomingcallAnswer(callUUID);
     };
 
     const endIncomingCall = () => {
         console.log('Incoming call ended');
-        endIncomingcallAnswer();
+        Incomingvideocall.endIncomingcallAnswer();
     };
 
     // const callInitialized = () => {
-    configure(incomingCallAnswer, endIncomingCall);
-    displayIncomingCall('John');
-    backToForeground()
+    Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+    Incomingvideocall.displayIncomingCall('John');
+    Incomingvideocall.backToForeground()
     // };
 };
 

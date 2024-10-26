@@ -19,7 +19,7 @@ import { showErrorToast, showSuccessToast, toastConfig } from "./src/helper/cons
 import Colors from "./src/helper/Colors";
 import IncomingCallModal from "./src/component/IncomingCallModal";
 import RNCallKeep from "react-native-callkeep";
-import useIncomingCall from "./src/component/CallKeepComponent";
+import Incomingvideocall from "./src/component/CallKeepComponent";
 
 const options = {
   ios: {
@@ -232,33 +232,35 @@ const App = () => {
     );
   };
 
-  const {
-    displayIncomingCall,
-    startCall,
-    reportEndCallWithUUID,
-    endIncomingcallAnswer,
-    endAllCalls,
-    backToForeground,
-    configure
-  } = useIncomingCall();
+  // const {
+  //   displayIncomingCall,
+  //   startCall,
+  //   reportEndCallWithUUID,
+  //   endIncomingcallAnswer,
+  //   endAllCalls,
+  //   backToForeground,
+  //   configure
+  // } = useIncomingCall();
 
   const incomingCallAnswer = ({ callUUID }) => {
     console.log("incomingCallAnswer");
 
-    backToForeground();
-    endIncomingcallAnswer(callUUID);
+    Incomingvideocall.backToForeground();
+    Incomingvideocall.endIncomingcallAnswer(callUUID);
     setModalVisible(true)
   }
 
   const endIncomingCall = () => {
     console.log("endIncomingCall");
-    endIncomingcallAnswer();
+    Incomingvideocall.endIncomingcallAnswer();
   }
 
   const callInitialized = () => {
-    configure(incomingCallAnswer, endIncomingCall);
-    displayIncomingCall("John");
-    backToForeground();
+    console.log("cccccc");
+
+    Incomingvideocall.configure(incomingCallAnswer, endIncomingCall);
+    Incomingvideocall.displayIncomingCall("John");
+    Incomingvideocall.backToForeground();
   }
 
 
@@ -331,9 +333,9 @@ const App = () => {
         <View>
           <Text>Incoming Call Screen</Text>
           <Button title="Display Incoming Call" onPress={() => callInitialized()} />
-          <Button title="Start Call" onPress={() => startCall({ handle: "123456789", localizedCallerName: "Caller Name" })} />
-          <Button title="End Call" onPress={endIncomingcallAnswer} />
-          <Button title="End All Calls" onPress={endAllCalls} />
+          {/* <Button title="Start Call" onPress={() => startCall({ handle: "123456789", localizedCallerName: "Caller Name" })} />
+          <Button title="End Call" onPress={Incomingvideocall.endIncomingcallAnswer} /> */}
+          {/* <Button title="End All Calls" onPress={endAllCalls} /> */}
         </View>
       </View>
     }

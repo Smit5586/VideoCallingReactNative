@@ -1,49 +1,70 @@
-import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import RNCallKeep from "react-native-callkeep";
 import uuid from "react-native-uuid";
 // import VoipPushNotification from "react-native-voip-push-notification";
 
-const useIncomingCall = (incomingcallAnswer, endIncomingCall) => {
-    const currentCallId = useRef(null);
+class IncomingCall {
+    constructor() {
+        this.currentCallId = null;
+    }
 
-    const setupCallKeep = () => {
+    configure = (incomingcallAnswer, endIncomingCall) => {
+        try {
+            this.setupCallKeep();
+            Platform.OS === "android" && RNCallKeep.setAvailable(true);
+            RNCallKeep.addEventListener("answerCall", incomingcallAnswer);
+            RNCallKeep.addEventListener("endCall", endIncomingCall);
+        } catch (error) {
+            console.error("initializeCallKeep error:", error?.message);
+        }
+    };
+
+    setupCallKeep = () => {
         try {
             RNCallKeep.setup({
                 ios: {
-                    appName: "videoAppDemo",
+                    appName: "VideoSDK",
                     supportsVideo: false,
                     maximumCallGroups: "1",
                     maximumCallsPerCallGroup: "1",
                 },
                 android: {
                     alertTitle: "Permissions required",
-                    alertDescription: "This application needs to access your phone accounts",
+                    alertDescription:
+                        "This application needs to access your phone accounts",
                     cancelButton: "Cancel",
                     okButton: "Ok",
                 },
             });
-            Platform.OS === "android" && RNCallKeep.setAvailable(true);
         } catch (error) {
             console.error("initializeCallKeep error:", error?.message);
         }
     };
-
-    const getCurrentCallId = () => {
-        if (!currentCallId.current) {
-            currentCallId.current = uuid.v4();
-        }
-        return currentCallId.current;
+    // Use startCall to ask the system to start a call - Initiate an outgoing call from this point
+    startCall = ({ handle, localizedCallerName }) => {
+        // Your normal start call action
+        RNCallKeep.startCall(this.getCurrentCallId(), handle, localizedCallerName);
     };
 
-    const startCall = ({ handle, localizedCallerName }) => {
-        RNCallKeep.startCall(getCurrentCallId(), handle, localizedCallerName);
+    reportEndCallWithUUID = (callUUID, reason) => {
+        RNCallKeep.reportEndCallWithUUID(callUUID, reason);
     };
 
-    const displayIncomingCall = (callerName) => {
+    endIncomingcallAnswer = () => {
+        RNCallKeep.endCall(this.currentCallId);
+        this.currentCallId = null;
+        this.removeEvents();
+    };
+
+    removeEvents = () => {
+        RNCallKeep.removeEventListener("answerCall");
+        RNCallKeep.removeEventListener("endCall");
+    };
+
+    displayIncomingCall = (callerName) => {
         Platform.OS === "android" && RNCallKeep.setAvailable(false);
         RNCallKeep.displayIncomingCall(
-            getCurrentCallId(),
+            this.getCurrentCallId(),
             callerName,
             callerName,
             "number",
@@ -52,64 +73,36 @@ const useIncomingCall = (incomingcallAnswer, endIncomingCall) => {
         );
     };
 
-    const reportEndCallWithUUID = (callUUID, reason) => {
-        RNCallKeep.reportEndCallWithUUID(callUUID, reason);
-    };
-
-    const endIncomingcallAnswer = () => {
-        RNCallKeep.endCall(currentCallId.current);
-        currentCallId.current = null;
-        removeEvents();
-    };
-
-    const removeEvents = () => {
-        RNCallKeep.removeEventListener("answerCall");
-        RNCallKeep.removeEventListener("endCall");
-    };
-
-    const endAllCalls = () => {
-        RNCallKeep.endAllCalls();
-        currentCallId.current = null;
-        removeEvents();
-    };
-
-    const backToForeground = () => {
+    backToForeground = () => {
         RNCallKeep.backToForeground();
     };
 
-    const configure = (incomingCallAnswer, endIncomingCall) => {
-        setupCallKeep();
-
-        RNCallKeep.addEventListener("answerCall", incomingCallAnswer);
-        RNCallKeep.addEventListener("endCall", endIncomingCall);
-
-        return () => {
-            removeEvents();
-        };
+    getCurrentCallId = () => {
+        if (!this.currentCallId) {
+            this.currentCallId = uuid.v4();
+        }
+        return this.currentCallId;
     };
 
-    // useEffect(() => {
-    //     console.log("callleddddd");
-
-    //     setupCallKeep();
-
-    //     RNCallKeep.addEventListener("answerCall", incomingcallAnswer);
-    //     RNCallKeep.addEventListener("endCall", endIncomingCall);
-
-    //     return () => {
-    //         removeEvents();
-    //     };
-    // }, [incomingcallAnswer, endIncomingCall]);
-
-    return {
-        displayIncomingCall,
-        startCall,
-        reportEndCallWithUUID,
-        endIncomingcallAnswer,
-        endAllCalls,
-        backToForeground,
-        configure
+    endAllCall = () => {
+        RNCallKeep.endAllCalls();
+        this.currentCallId = null;
+        this.removeEvents();
     };
-};
 
-export default useIncomingCall;
+    setupEventListeners() {
+        if (Platform.OS == "ios") {
+            // --- NOTE: You still need to subscribe / handle the rest events as usuall.
+            // --- This is just a helper whcih cache and propagate early fired events if and only if for
+            // --- "the native events which DID fire BEFORE js bridge is initialed",
+            // --- it does NOT mean this will have events each time when the app reopened.
+            // ===== Step 1: subscribe `register` event =====
+            // --- this.onVoipPushNotificationRegistered
+            // ===== Step 4: register =====
+            // --- it will be no-op if you have subscribed before (like in native side)
+            // --- but will fire `register` event if we have latest cahced voip token ( it may be empty if no token at all )
+        }
+    }
+}
+
+export default Incomingvideocall = new IncomingCall();
