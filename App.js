@@ -65,7 +65,17 @@ const App = () => {
   const [isHost, setIsHost] = useState(false);
   const [name, setName] = useState("");
   // const [isModalVisible, setModalVisible] = useState(false);
-  const { isModalVisible, hideModal } = useContext(ModalContext);
+  const { isModalVisible, hideModal, tempMeetingId, setTempMeetingId } = useContext(ModalContext);
+
+  useEffect(() => {
+    if (isModalVisible) {
+      console.log("tempMeetingId", tempMeetingId);
+
+      setMeetingIdNotification(tempMeetingId)
+    }
+  }, [isModalVisible, tempMeetingId])
+
+
   const handleIncomingCall = () => {
     // setTimeout(() => {
     // setModalVisible(true);
@@ -74,17 +84,19 @@ const App = () => {
 
   const handleAcceptCall = () => {
     Incomingvideocall.endIncomingcallAnswer()
-    setMeetingId(meetingIdNotification)
-    // setMeetingId(meetingIdNotification);
-    // setModalVisible(false);
-    // Handle accept call logic here
+    console.log("meetingIdNotification", meetingIdNotification);
+    if (meetingIdNotification) {
+      setMeetingId(meetingIdNotification)
+    } else {
+
+    }
+    hideModal()
   };
 
   const handleDeclineCall = () => {
-    // setModalVisible(false);
     Incomingvideocall.endIncomingcallAnswer()
+    hideModal()
     setMeetingId(null)
-    // Handle decline call logic here
   };
   useEffect(() => {
     const initializeNotifications = async () => {
@@ -96,21 +108,13 @@ const App = () => {
     };
 
     const handleNotifications = () => {
-      // FirebaseService.onForegroundNotification(remoteMessage => {
-      //   const receivedMeetingId = remoteMessage?.data?.meetingId;
-      //   if (receivedMeetingId) {
-      //     setMeetingId(receivedMeetingId);
-      //   }
-      // });
-
       // NotificationService.listenBackgroundMessages(callInitialized);
       NotificationService.listenForegroundMessages(callInitialized)
-      // Handle notification opened while app is in background
+
       FirebaseService.onNotificationOpenedApp(remoteMessage => {
         const receivedMeetingId = remoteMessage?.data?.meetingId;
         const name = remoteMessage?.data?.name;
         if (receivedMeetingId) {
-          // setMeetingId(receivedMeetingId);
           setMeetingIdNotification(receivedMeetingId);
           handleIncomingCall()
           setIsHost(false)
@@ -121,12 +125,10 @@ const App = () => {
       FirebaseService.checkInitialNotification().then(initialMessage => {
         const { meetingId, name } = initialMessage?.data || {};
         if (meetingId) {
-          // setMeetingId(meetingId);
           setMeetingIdNotification(meetingId);
           handleIncomingCall()
           setIsHost(false)
           setName(name)
-          // Alert.alert("Notification", `App opened from notification. Meeting ID: ${meetingId}`);
         }
       });
     };
@@ -135,35 +137,6 @@ const App = () => {
     FirebaseService.getToken();
     handleNotifications();
   }, []);
-
-  // useEffect(() => {
-  //   const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
-  //     const { notification } = detail;
-
-  //     if (type === EventType.PRESS) {
-  //       console.log('Notification pressed:', notification);
-  //       // Handle notification tap, navigate to a specific screen
-  //       // You can extract the meetingId from the notification and set it
-  //       const receivedMeetingId = notification?.data?.meetingId;
-  //       const name = notification?.data?.name;
-  //       if (receivedMeetingId) {
-  //         handleIncomingCall()
-  //         // setMeetingId(receivedMeetingId);  // Automatically navigate to meeting
-  //         setMeetingIdNotification(receivedMeetingId);  // Automatically navigate to meeting
-  //         setIsHost(false);
-  //         setName(name);
-  //       }
-  //       await notifee.cancelNotification(notification.id);
-  //     } else if (type === EventType.DISMISSED) {
-  //       console.log('Notification dismissed:', notification);
-  //     }
-  //   });
-
-  //   return () => {
-  //     // Unsubscribe from foreground event when component is unmounted
-  //     unsubscribe();
-  //   };
-  // }, []);
 
   const handleEnableNotifications = async () => {
     const permissionGranted = await NotificationService.initialize();
@@ -186,7 +159,7 @@ const App = () => {
       //   method: 'POST',
       //   body: JSON.stringify({
       //     // token: 'dCI7pOYvQEmo7tmf7gNR-4:APA91bG93lYLdsNbUZOgo0WQuNxpL3-tnhEfs_0Y_QGaAa97VqT8HHLkPR2jwcAL55okyc-PU9nT7DCoo3HCTHM_pmYv7QmKB57NZ4kmItf0Ytz1QjwuMyU53Vy9shDyi8fffJRNIjpR',
-      //     token: 'cJEOC7VKSrS1LItyFCDXDa:APA91bEqfkdel5DFXEQ7RJoHiKR1qU594YUk2CDKPcgNDhOe9d8WDUQcB4VzI0VsGBWaRLtZWkt9DyuEZF-GtyWcDx9zA0aNRD_xu-SfzNsr8OA75Q-2EE36h9J9JKIIymvJzurp5aOz',
+      //     token: 'd441S66dQ8-nrB1OD58k3h:APA91bH2YD1aW5XNEUz3g-d4JPrNR8cP7Ul9n7v0Y7arP73uRpuO2v0eIY3Cw0FAv9ABBM9SCBNM4SmrGJdG4vfznQLQJLGN9SrS9OqneSN_bUDk3X5H8655UbnJccyzhv5t89bF_hxE',
       //     meetingId: meetingId,
       //     name: name
       //   })
@@ -274,7 +247,7 @@ const App = () => {
     Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground();
     setMeetingIdNotification(meetingId)
-    showModal();
+    showModal(meetingId);
   }
 
 

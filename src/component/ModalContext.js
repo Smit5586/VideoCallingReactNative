@@ -8,16 +8,39 @@ let setMeetingIdExternal;
 export const ModalProvider = ({ children }) => {
     const [isModalVisible, setModalVisible] = useState(false);
     const [meetingId, setMeetingId] = useState(null);
+    const [tempMeetingId, setTempMeetingId] = useState(null)
     setMeetingIdExternal = setMeetingId;
     // Register the modal visibility function with ModalManager
     useEffect(() => {
-        setModalRef(setModalVisible);  // Register setModalVisible as the global ref
+        // Register the ref with a function that updates both visibility and meetingId
+        setModalRef((visible, id) => {
+            console.log("visible", visible);
+
+            setTempMeetingId(null)
+            setModalVisible(visible);
+            if (id !== undefined) {
+                setTempMeetingId(id)
+            } else {
+                setTempMeetingId(null)
+            }
+        });
     }, []);
 
-    const hideModal = () => setModalVisible(false);
+    const hideModal = () => {
+        setModalVisible(false)
+        // setTempMeetingId(null)
+    };
 
     return (
-        <ModalContext.Provider value={{ isModalVisible, hideModal, meetingId, setMeetingId }}>
+        <ModalContext.Provider
+            value={{
+                isModalVisible,
+                hideModal,
+                meetingId,
+                setMeetingId,
+                tempMeetingId,
+                setTempMeetingId
+            }}>
             {children}
         </ModalContext.Provider>
     );

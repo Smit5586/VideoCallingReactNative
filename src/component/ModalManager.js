@@ -8,12 +8,12 @@ export const setModalRef = (ref) => {
     modalRef.current = ref;
 };
 
-export const showModal = () => {
+export const showModal = (meetingId) => {
     console.log("current 1");
 
     if (modalRef.current) {
         console.log("current 2");
-        modalRef.current(true);  // Set modal to visible
+        modalRef.current(true, meetingId);
     }
 };
 

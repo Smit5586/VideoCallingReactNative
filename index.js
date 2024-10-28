@@ -71,6 +71,7 @@ const firebaseListener = async (initialMessage) => {
 
     const endIncomingCall = () => {
         console.log('Incoming call ended');
+        hideModal()
         Incomingvideocall.endIncomingcallAnswer();
     };
 
@@ -81,7 +82,7 @@ const firebaseListener = async (initialMessage) => {
     Incomingvideocall.displayIncomingCall(name);
     Incomingvideocall.backToForeground()
     setTimeout(() => {
-        showModal();
+        showModal(meetingId);
     }, 300);
 
 };
