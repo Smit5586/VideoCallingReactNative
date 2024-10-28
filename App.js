@@ -241,13 +241,21 @@ const App = () => {
 
   const callInitialized = (initialMessage) => {
     console.log("cccccc");
-    const { meetingId, name } = initialMessage?.data || {};
-    const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
-    Incomingvideocall.configure(answerHandler, endIncomingCall);
-    Incomingvideocall.displayIncomingCall(name);
-    Incomingvideocall.backToForeground();
-    setMeetingIdNotification(meetingId)
-    showModal(meetingId);
+    const { meetingId, name, status } = initialMessage?.data || {};
+
+    if (status == 'ended') {
+      Incomingvideocall.endIncomingcallAnswer()
+      setMeetingId(null)
+      setMeetingIdNotification(null)
+      hideModal()
+    } else {
+      const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
+      Incomingvideocall.configure(answerHandler, endIncomingCall);
+      Incomingvideocall.displayIncomingCall(name);
+      Incomingvideocall.backToForeground();
+      setMeetingIdNotification(meetingId)
+      showModal(meetingId);
+    }
   }
 
 

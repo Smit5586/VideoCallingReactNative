@@ -48,7 +48,6 @@ import { useContext, useEffect } from 'react';
 import { ModalContext, ModalProvider, updateMeetingIdExternally, useMeeting } from './src/component/ModalContext';
 import { showModal, hideModal } from './src/component/ModalManager';
 
-// Initialize Video SDK
 register();
 
 
@@ -76,15 +75,18 @@ const firebaseListener = async (initialMessage) => {
     };
 
 
-    const { meetingId, name } = initialMessage?.data || {};
-    const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
-    Incomingvideocall.configure(answerHandler, endIncomingCall);
-    Incomingvideocall.displayIncomingCall(name);
-    Incomingvideocall.backToForeground()
-    setTimeout(() => {
-        showModal(meetingId);
-    }, 300);
-
+    const { meetingId, name, status } = initialMessage?.data || {};
+    if (status == 'ended') {
+        endIncomingCall()
+    } else {
+        const answerHandler = (params) => incomingCallAnswer({ ...params, meetingId });
+        Incomingvideocall.configure(answerHandler, endIncomingCall);
+        Incomingvideocall.displayIncomingCall(name);
+        Incomingvideocall.backToForeground()
+        setTimeout(() => {
+            showModal(meetingId);
+        }, 300);
+    }
 };
 
 messaging().setBackgroundMessageHandler(firebaseListener);
