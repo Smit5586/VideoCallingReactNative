@@ -4,6 +4,7 @@ import { Platform, Text, View } from "react-native";
 import ParticipantList from "./ParticipantList";
 import ControlsContainer from "./ControlsContainer";
 import { showErrorToast } from "../helper/constants";
+// import VideosdkRPK from "../../VideosdkRPK";
 
 let isUsingFrontCamera = true;
 const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
@@ -29,8 +30,7 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
         startRecording,
         stopRecording,
         toggleScreenShare,
-        localScreenShareOn
-
+        localScreenShareOn,
     } = useMeeting({
         onMeetingLeft,
         onParticipantLeft,
@@ -68,17 +68,17 @@ const MeetingView = ({ setMeetingId, isHostTwo, setParticipants, name }) => {
 
     useEffect(() => {
         if (Platform.OS == "ios") {
-            VideosdkRPK.addListener("onScreenShare", (event) => {
-                if (event === "START_BROADCAST") {
-                    enableScreenShare();
-                } else if (event === "STOP_BROADCAST") {
-                    disableScreenShare();
-                }
-            });
+            // VideosdkRPK.addListener("onScreenShare", (event) => {
+            //     if (event === "START_BROADCAST") {
+            //         enableScreenShare();
+            //     } else if (event === "STOP_BROADCAST") {
+            //         disableScreenShare();
+            //     }
+            // });
 
-            return () => {
-                VideosdkRPK.removeSubscription("onScreenShare");
-            };
+            // return () => {
+            //     VideosdkRPK.removeSubscription("onScreenShare");
+            // };
         }
     }, []);
 
